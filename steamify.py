@@ -165,7 +165,7 @@ class PixelTod:
         response_json = res.json()
         #self.log(f'{response_json}')
         farm = response_json.get('msg')
-        balance = response_json.get('data', {}).get('points')
+        
         if farm == 'too early to claim':
             self.log(f"{Fore.LIGHTRED_EX}Еще не пришло время клейма sparks")
         else:
