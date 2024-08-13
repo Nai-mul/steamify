@@ -7,7 +7,7 @@ import requests
 from datetime import datetime
 from colorama import init, Fore, Style
 from urllib.parse import unquote
-
+import cloudscraper
 
 init(autoreset=True)
 
@@ -22,6 +22,7 @@ class Data:
 
 class PixelTod:
     def __init__(self):
+        self.scraper = cloudscraper.create_scraper()
         self.DEFAULT_COUNTDOWN = (2 * 3600) + (5 * 60)  # Интервал между повтором скрипта, 6 часов 5 минут дефолт
         self.INTERVAL_DELAY = 3  # Интервал между каждым аккаунтом, 3 секунды дефолт
         self.base_headers = {
@@ -94,9 +95,9 @@ class PixelTod:
         while True:
             try:
                 if method == 'GET':
-                    res = requests.get(url, headers=headers)
+                    res = self.scraper.get(url, headers=headers)
                 elif method == 'POST':
-                    res = requests.post(url, headers=headers, data=data)
+                    res = self.scraper.post(url, headers=headers, data=data)
                 else:
                     raise ValueError(f'Не поддерживаемый метод: {method}')
 
@@ -105,9 +106,7 @@ class PixelTod:
 
                 open('.http.log', 'a', encoding='utf-8').write(f'{res.text}\n')
                 return res
-            except (
-            requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout,
-            requests.exceptions.Timeout):
+            except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout, requests.exceptions.Timeout):
                 self.log(f'{Fore.LIGHTRED_EX}Ошибка подключения соединения!')
                 continue
 
@@ -165,7 +164,6 @@ class PixelTod:
         response_json = res.json()
         #self.log(f'{response_json}')
         farm = response_json.get('msg')
-        
         if farm == 'too early to claim':
             self.log(f"{Fore.LIGHTRED_EX}Еще не пришло время клейма sparks")
         else:
