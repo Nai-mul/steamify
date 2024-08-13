@@ -6,7 +6,7 @@ import hashlib
 import requests
 from colorama import init, Fore
 from urllib.parse import unquote
-
+import cloudscraper
 
 init(autoreset=True)
 
@@ -21,6 +21,7 @@ class Data:
 
 class PixelTod:
     def __init__(self):
+        self.scraper = cloudscraper.create_scraper()
         self.INTERVAL_DELAY = 1
         self.base_headers = {
             "Accept": "application/json, text/plain, */*",
@@ -93,21 +94,21 @@ class PixelTod:
         while True:
             try:
                 if method == 'GET':
-                    res = requests.get(url, headers=headers)
+                    res = self.scraper.get(url, headers=headers)
                 elif method == 'POST':
-                    res = requests.post(url, headers=headers, data=data)
+                    res = self.scraper.post(url, headers=headers, data=data)
                 else:
                     raise ValueError(f'Не поддерживаемый метод: {method}')
 
                 if res.status_code == 401:
-                    print(f'{Fore.LIGHTRED_EX}{res.text}')
+                    self.log(f'{Fore.LIGHTRED_EX}{res.text}')
 
                 open('.http.log', 'a', encoding='utf-8').write(f'{res.text}\n')
                 return res
             except (
             requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout,
             requests.exceptions.Timeout):
-                print(f'{Fore.LIGHTRED_EX}Ошибка подключения соединения!')
+                self.log(f'{Fore.LIGHTRED_EX}Ошибка подключения соединения!')
                 continue
 
 
