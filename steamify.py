@@ -81,6 +81,7 @@ class PixelTod:
         self.checkin(data)
         self.solve_multiplier(data)
         self.sparks(data)
+        self.claim_ticket(data)
 
     def countdown(self, t):
         while t:
@@ -282,7 +283,44 @@ class PixelTod:
                         self.log(f"{Fore.LIGHTYELLOW_EX}Забрал буст {mult_title}!")
                         continue
 
+    def claim_ticket(self, data: Data):
+        url = "https://api.app.steamify.io/api/v1/user/task/video"
+        headers = self.base_headers.copy()
+        headers["Authorization"] = f"Bearer {data.init_data}"
 
+        res = self.api_call(url, headers=headers)
+        response_json = res.json()
+        #print(f'{response_json}')
+
+        if response_json.get('success') and response_json.get('data'):
+            watched = response_json['data'].get('watched', 0)
+            max_tasks = response_json['data'].get('max', 0)
+            num_claims = max_tasks - watched
+            if num_claims > 1:
+                self.log(f'{Fore.LIGHTYELLOW_EX}Начал сбор билетов: {Fore.LIGHTWHITE_EX}{num_claims} {Fore.LIGHTRED_EX}Жди {num_claims*3} секунд ')
+
+                successful_claims = 0
+
+                for _ in range(num_claims):
+                    url_claim = "https://api.app.steamify.io/api/v1/user/task/video/claim"
+                    payload = {
+                        "task_id": 1
+                    }
+
+                    res_claim = self.api_call(url_claim, headers=headers, data=json.dumps(payload), method='POST')
+                    response_claim_json = res_claim.json()
+                    #print(f'Claim response: {response_claim_json}')
+
+                    if response_claim_json.get('success'):
+                        successful_claims += 1
+                    else:
+                        self.log(f"{Fore.LIGHTRED_EX}Ошибка при выполнении запроса на клейм")
+
+                    time.sleep(3)
+
+                self.log(f'{Fore.LIGHTYELLOW_EX}Забрал билетов: {Fore.LIGHTWHITE_EX}{successful_claims}')
+            else:
+                return
     def log(self, message):
         now = datetime.now().isoformat(" ").split(".")[0]
         print(f"{Fore.LIGHTBLACK_EX}[{now}]{Style.RESET_ALL} {message}")
