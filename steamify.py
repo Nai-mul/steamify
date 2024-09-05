@@ -81,7 +81,7 @@ class PixelTod:
         self.checkin(data)
         self.solve_multiplier(data)
         self.sparks(data)
-        self.claim_ticket(data)
+        #self.claim_ticket(data)
 
     def countdown(self, t):
         while t:
