@@ -122,13 +122,12 @@ class PixelTod:
         response_json = res.json()
         #print(f'{response_json}')
         suc = response_json.get('success', {})
-        cases = response_json.get('data', [])
+
 
         if suc:
-            for case in cases:
-                case_name = case.get('name')
-                if case_name:
-                    print(f"{Fore.LIGHTBLUE_EX}{case_name}")
+
+            print(f"{Fore.LIGHTBLUE_EX}Открыл")
+
         else:
             print(f"{Fore.LIGHTRED_EX}Не удалось открыть кейс.")
 
