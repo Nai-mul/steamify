@@ -24,7 +24,7 @@ class PixelTod:
     def __init__(self):
         self.scraper = cloudscraper.create_scraper()
         self.DEFAULT_COUNTDOWN = (2 * 3600) + (5 * 60)  # Интервал между повтором скрипта, 6 часов 5 минут дефолт
-        self.INTERVAL_DELAY = 10  # Интервал между каждым аккаунтом, 3 секунды дефолт
+        self.INTERVAL_DELAY = 30  # Интервал между каждым аккаунтом, 3 секунды дефолт
         self.base_headers = {
             "Accept": "application/json, text/plain, */*",
             "Accept-Language": "ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
