@@ -1,3 +1,8 @@
+<div align="right">
+  <a href="https://github.com/meKryztal">
+    <img src="https://github.com/user-attachments/assets/c381e8c0-e56a-4134-b333-4ec0dffab514" alt="donate" width="150">
+  </a>
+</div>
 # Автофарм Steamify
 ![photo_2024-07-23_22-02-01](https://github.com/user-attachments/assets/b854b0bf-2d7d-4c0a-ad9a-35d0a3da349d)
 
