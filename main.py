@@ -11,7 +11,6 @@ import cloudscraper
 
 init(autoreset=True)
 
-
 class Data:
     def __init__(self, init_data, userid, username, secret):
         self.init_data = init_data
@@ -19,12 +18,11 @@ class Data:
         self.username = username
         self.secret = secret
 
-
 class PixelTod:
     def __init__(self):
         self.scraper = cloudscraper.create_scraper()
-        self.DEFAULT_COUNTDOWN = (2 * 3600) + (5 * 60)  # Интервал между повтором скрипта, 6 часов 5 минут дефолт
-        self.INTERVAL_DELAY = 3  # Интервал между каждым аккаунтом, 3 секунды дефолт
+        self.DEFAULT_COUNTDOWN = (2 * 3600) + (5 * 60) 
+        self.INTERVAL_DELAY = 3  
         self.base_headers = {
             "Accept": "application/json, text/plain, */*",
             "Accept-Language": "ru,en;q=0.9,en-GB;q=0.8,en-US;q=0.7",
@@ -34,8 +32,6 @@ class PixelTod:
             'referer': 'https://app.steamify.io',
             "User-Agent": 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36 Edg/126.0.0.0',
         }
-
-
 
     def get_secret(self, userid):
         rawr = "adwawdasfajfklasjglrejnoierjboivrevioreboidwa"
@@ -49,14 +45,14 @@ class PixelTod:
         with open("data.txt", "r") as file:
             datas = file.read().splitlines()
 
-        self.log(f'{Fore.LIGHTYELLOW_EX}Обнаружено аккаунтов: {len(datas)}')
+        self.log(f'{Fore.LIGHTYELLOW_EX}Accounts detected: {len(datas)}')
         if not datas:
-            self.log(f'{Fore.LIGHTYELLOW_EX}Пожалуйста, введите свои данные в initdata.txt')
+            self.log(f'{Fore.LIGHTYELLOW_EX}Please, enter your data in data.txt')
             sys.exit()
         print('-' * 50)
         while True:
             for no, data in enumerate(datas):
-                self.log(f'{Fore.LIGHTYELLOW_EX}Номер аккаунта: {Fore.LIGHTWHITE_EX}{no + 1}')
+                self.log(f'{Fore.LIGHTYELLOW_EX}Account_Number: {Fore.LIGHTWHITE_EX}{no + 1}')
                 data_parse = self.data_parsing(data)
                 user = json.loads(data_parse['user'])
                 userid = str(user['id'])
@@ -64,7 +60,7 @@ class PixelTod:
                 last_name = user.get('last_name')
                 username = user.get('username')
 
-                self.log(f'{Fore.LIGHTYELLOW_EX}Аккаунт: {Fore.LIGHTWHITE_EX}{first_name} {last_name}')
+                self.log(f'{Fore.LIGHTYELLOW_EX}Account: {Fore.LIGHTWHITE_EX}{first_name} {last_name}')
                 secret = self.get_secret(userid)
                 new_data = Data(data, userid, username, secret)
                 self.process_account(new_data)
@@ -87,7 +83,7 @@ class PixelTod:
         while t:
             one, two = divmod(t, 3600)
             three, four = divmod(two, 60)
-            print(f"{Fore.LIGHTWHITE_EX}Ожидание до {one:02}:{three:02}:{four:02} ", flush=True, end="\r")
+            print(f"{Fore.LIGHTWHITE_EX}Waiting until {one:02}:{three:02}:{four:02} ", flush=True, end="\r")
             t -= 1
             time.sleep(1)
         print("                          ", flush=True, end="\r")
@@ -100,7 +96,7 @@ class PixelTod:
                 elif method == 'POST':
                     res = self.scraper.post(url, headers=headers, data=data)
                 else:
-                    raise ValueError(f'Не поддерживаемый метод: {method}')
+                    raise ValueError(f'Unsupported method: {method}')
 
                 if res.status_code == 401:
                     self.log(f'{Fore.LIGHTRED_EX}{res.text}')
@@ -108,10 +104,10 @@ class PixelTod:
                 open('.http.log', 'a', encoding='utf-8').write(f'{res.text}\n')
                 return res
             except (requests.exceptions.ConnectionError, requests.exceptions.ConnectTimeout, requests.exceptions.ReadTimeout, requests.exceptions.Timeout):
-                self.log(f'{Fore.LIGHTRED_EX}Ошибка подключения соединения!')
+                self.log(f'{Fore.LIGHTRED_EX}Connection error!')
                 continue
             except requests.exceptions.JSONDecodeError:
-                self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+                self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
 
     def get_me(self, data: Data):
         url = 'https://api.app.steamify.io/api/v1/user/me'
@@ -120,14 +116,14 @@ class PixelTod:
         res = self.api_call(url, headers=headers)
 
         if not res.text:
-            self.log(f'{Fore.LIGHTRED_EX}Пустой ответ от API get_me.')
+            self.log(f'{Fore.LIGHTRED_EX}Empty response from API get_me.')
             return
 
         try:
             response_json = res.json()
             #self.log(f'{response_json}')
             balance = response_json.get('data', {}).get('points', 'N/A')
-            self.log(f'{Fore.LIGHTYELLOW_EX}Общий баланс: {Fore.LIGHTWHITE_EX}{balance}')
+            self.log(f'{Fore.LIGHTYELLOW_EX}Total balance: {Fore.LIGHTWHITE_EX}{balance}')
             ref = response_json.get('data', {}).get('inviter')
             if ref == 'None':
                 url_ref = 'https://api.app.steamify.io/api/v1/user/set-inviter'
@@ -137,7 +133,7 @@ class PixelTod:
                 res = self.api_call(url_ref, headers=headers, json=payload)
 
         except json.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Не удалось декодировать JSON-ответ от API get_me. Ответ: {res.text}')
+            self.log(f'{Fore.LIGHTRED_EX}Failed to decode JSON-response from API get_me. Response: {res.text}')
 
     def claim_farming(self, data: Data):
         url = "https://api.app.steamify.io/api/v1/farm/claim"
@@ -151,16 +147,16 @@ class PixelTod:
             balance = response_json.get('data', {}).get('points')
             if farm == 'claim is not available':
                 if balance == 0:
-                    self.log(f"{Fore.LIGHTRED_EX}Первый запуск клейма")
+                    self.log(f"{Fore.LIGHTRED_EX}First claim launch")
                 else:
-                    self.log(f"{Fore.LIGHTRED_EX}Еще не пришло время клейма")
+                    self.log(f"{Fore.LIGHTRED_EX}It’s not time to claim yet")
             else:
                 balance = response_json.get('data', {}).get('claim', {}).get('total_rewards')
-                self.log(f"{Fore.LIGHTYELLOW_EX}Забрал с фарминга: {Fore.LIGHTWHITE_EX}{balance}")
+                self.log(f"{Fore.LIGHTYELLOW_EX}Claimed from farming: {Fore.LIGHTWHITE_EX}{balance}")
             return
 
         except requests.exceptions.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+            self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
 
     def sparks(self, data: Data):
         url = "https://api.app.steamify.io/api/v1/game/case/inventory/claim"
@@ -172,13 +168,13 @@ class PixelTod:
             self.log(f'{response_json}')
             farm = response_json.get('msg')
             if farm == 'too early to claim':
-                self.log(f"{Fore.LIGHTRED_EX}Еще не пришло время клейма sparks")
+                self.log(f"{Fore.LIGHTRED_EX}It’s not time to claim sparks yet")
             else:
                 balance = response_json.get('data', {}).get('claimed_sparks', {})
                 self.log(f"{Fore.LIGHTYELLOW_EX}Забрал sparks: {Fore.LIGHTWHITE_EX}{balance}")
             return
         except requests.exceptions.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+            self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
     def start_farming(self, data: Data):
         url = "https://api.app.steamify.io/api/v1/farm/start"
         headers = self.base_headers.copy()
@@ -189,12 +185,12 @@ class PixelTod:
             #self.log(f'{response_json}')
             farm_s = response_json.get('msg')
             if farm_s == 'farm already in progress':
-                self.log(f"{Fore.LIGHTRED_EX}Фарминг уже запущен")
+                self.log(f"{Fore.LIGHTRED_EX}Error reading the response")
             else:
-                self.log(f"{Fore.LIGHTYELLOW_EX}Запустил фарминг")
+                self.log(f"{Fore.LIGHTYELLOW_EX}Error reading the response")
             return
         except requests.exceptions.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+            self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
 
     def get_friend(self, data: Data):
         url = "https://api.app.steamify.io/api/v1/user/invite"
@@ -211,12 +207,12 @@ class PixelTod:
                 response_json = res.json()
                 #self.log(f'{response_json}')
                 ref = response_json.get('data', {}).get('claimed_rewards', 'N/A')
-                self.log(f"{Fore.LIGHTYELLOW_EX}Забрал реферальный бонус: {Fore.LIGHTWHITE_EX}{ref}")
+                self.log(f"{Fore.LIGHTYELLOW_EX}Claimed the referral bonus: {Fore.LIGHTWHITE_EX}{ref}")
             else:
-                self.log(f"{Fore.LIGHTRED_EX}Нечего забирать с реферального бонуса")
+                self.log(f"{Fore.LIGHTRED_EX}Nothing to claim from the referral bonus")
             return
         except requests.exceptions.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+            self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
 
     def solve_task(self, data: Data):
         while True:
@@ -250,13 +246,13 @@ class PixelTod:
                         if response_json.get("data") and response_json["data"]["user_state"]:
                             claim_status = response_json["data"]["user_state"]["status"]
                             if claim_status == "claimed":
-                                self.log(f"{Fore.LIGHTYELLOW_EX}Выполнил задание {task_title}!")
+                                self.log(f"{Fore.LIGHTYELLOW_EX}Completed task {task_title}!")
                                 continue
 
                 if not task_started:
                     break
             except requests.exceptions.JSONDecodeError:
-                self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+                self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
 
     def checkin(self, data:Data):
         url = "https://api.app.steamify.io/api/v1/user/daily/claim"
@@ -267,15 +263,15 @@ class PixelTod:
             response_json = res.json()
             check = response_json.get('msg', [])
             if check == 'already claimed':
-                self.log(f"{Fore.LIGHTRED_EX}Уже делал чекин сегодня")
+                self.log(f"{Fore.LIGHTRED_EX}You already checked in today")
                 return
 
             if res.status_code == 200 or res.status_code == 201:
-                self.log(f"{Fore.LIGHTYELLOW_EX}Сделал чекин")
+                self.log(f"{Fore.LIGHTYELLOW_EX}Checked in")
                 return
             return
         except requests.exceptions.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+            self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
 
     def solve_multiplier(self, data: Data):
         url_mult = "https://api.app.steamify.io/api/v1/user/multiplier/list"
@@ -300,10 +296,10 @@ class PixelTod:
                     if response_json.get("data"):
                         claim_status = response_json["data"].get("status")
                         if claim_status == "active":
-                            self.log(f"{Fore.LIGHTYELLOW_EX}Забрал буст {mult_title}!")
+                            self.log(f"{Fore.LIGHTYELLOW_EX}Claimed boost {mult_title}!")
                             continue
         except requests.exceptions.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+            self.log(f'{Fore.LIGHTRED_EX}Error reading the response')
 
     def claim_ticket(self, data: Data):
         url = "https://api.app.steamify.io/api/v1/user/task/video"
@@ -320,7 +316,7 @@ class PixelTod:
                 max_tasks = response_json['data'].get('max', 0)
                 num_claims = max_tasks - watched
                 if num_claims > 1:
-                    self.log(f'{Fore.LIGHTYELLOW_EX}Начал сбор билетов: {Fore.LIGHTWHITE_EX}{num_claims} {Fore.LIGHTRED_EX}Жди {num_claims*3} секунд ')
+                    self.log(f'{Fore.LIGHTYELLOW_EX}Started collecting tickets: {Fore.LIGHTWHITE_EX}{num_claims} {Fore.LIGHTRED_EX}Wait {num_claims*3} seconds ')
 
                     successful_claims = 0
 
@@ -337,20 +333,18 @@ class PixelTod:
                         if response_claim_json.get('success'):
                            successful_claims += 1
                         else:
-                           self.log(f"{Fore.LIGHTRED_EX}Ошибка при выполнении запроса на клейм")
+                           self.log(f"{Fore.LIGHTRED_EX}Error while executing the claim request")
 
                         time.sleep(3)
 
-                    self.log(f'{Fore.LIGHTYELLOW_EX}Забрал билетов: {Fore.LIGHTWHITE_EX}{successful_claims}')
+                    self.log(f'{Fore.LIGHTYELLOW_EX}Picked up tickets: {Fore.LIGHTWHITE_EX}{successful_claims}')
                 else:
                     return
         except requests.exceptions.JSONDecodeError:
-            self.log(f'{Fore.LIGHTRED_EX}Ошибка чтения ответа')
+            self.log(f'{Fore.LIGHTRED_EX}Error reading response')
     def log(self, message):
         now = datetime.now().isoformat(" ").split(".")[0]
         print(f"{Fore.LIGHTBLACK_EX}[{now}]{Style.RESET_ALL} {message}")
-
-
 
 if __name__ == "__main__":
     try:
