@@ -46,7 +46,7 @@ class PixelTod:
         return {key: value for key, value in (i.split('=') for i in unquote(data).split('&'))}
 
     def main(self):
-        with open("initdata.txt", "r") as file:
+        with open("data.txt", "r") as file:
             datas = file.read().splitlines()
 
         self.log(f'{Fore.LIGHTYELLOW_EX}Обнаружено аккаунтов: {len(datas)}')
